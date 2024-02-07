@@ -1,0 +1,24 @@
+version: '3'
+
+services:
+  app-golang:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    # image: ${APP_IMAGE_PROD}:latest
+    environment: 
+      - PORT=8080
+    ports:
+      - "8080:8080"
+    networks:
+      - nginx
+  nginx:
+    image: nginx:stable
+    ports: 
+        - "8080:80"
+    volumes: 
+        - './nginx/:/etc/nginx/'
+    networks: 
+        - nginx
+networks:
+  nginx:
