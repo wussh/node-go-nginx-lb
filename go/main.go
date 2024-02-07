@@ -10,32 +10,35 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 )
 
-var (
-	PORT    = os.Getenv("PORT")
-	appName = os.Getenv("APP_NAME")
-)
-
 func main() {
-	if PORT == "" {
-		PORT = "3022"
+	// Check command-line arguments for port and app name
+	if len(os.Args) < 3 {
+		fmt.Println("Usage: go run main.go <port> <app-name>")
+		os.Exit(1)
 	}
-	if appName == "" {
-		appName = "vrugutuhu"
-	}
+
+	port := os.Args[1]
+	appName := os.Args[2]
 
 	e := echo.New()
 	e.Use(middleware.Logger())
 
-	e.GET("/", commonHandler)
-	e.GET("/ipHash", commonHandler)
-	e.GET("/leastConn", commonHandler)
+	e.GET("/", func(c echo.Context) error {
+		return commonHandler(c, appName)
+	})
+	e.GET("/ipHash", func(c echo.Context) error {
+		return commonHandler(c, appName)
+	})
+	e.GET("/leastConn", func(c echo.Context) error {
+		return commonHandler(c, appName)
+	})
 
 	e.GET("/metadata", metadataHandler)
 
-	e.Logger.Fatal(e.Start(fmt.Sprintf(":%s", PORT)))
+	e.Logger.Fatal(e.Start(fmt.Sprintf(":%s", port)))
 }
 
-func commonHandler(c echo.Context) error {
+func commonHandler(c echo.Context, appName string) error {
 	timestamp := time.Now().Format("January 2 2006, 3:04:05 pm")
 	req := c.Request()
 	data := map[string]interface{}{
